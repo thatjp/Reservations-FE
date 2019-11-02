@@ -28,6 +28,22 @@ const CREATE_RESERVATION = gql`
   }
 `
 
+const GET_SINGLE_RESERVATION = gql`
+  query getSingleReservation(
+    $id: String!,
+  ) {
+    getSingleReservation(
+      id: $id,
+    ) {
+      _id
+      firstName
+      lastName
+      arrivalDate
+      departureDate
+    }
+  }
+`
+
 interface FormProps {
   formType: string,
 }
@@ -37,6 +53,7 @@ type FormState = {
   lastName: string;
   arrivalDate: string;
   departureDate: string;
+  id: any;
 }
 
 class Form extends Component<FormProps, FormState> {
@@ -45,6 +62,7 @@ class Form extends Component<FormProps, FormState> {
     lastName: "",
     arrivalDate: "",
     departureDate: "",
+    id: "",
   }
 
   handleInputChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -55,11 +73,12 @@ class Form extends Component<FormProps, FormState> {
   };
 
   render() {
-    const {firstName, lastName, arrivalDate, departureDate}: {
+    const {firstName, lastName, arrivalDate, departureDate, id}: {
       firstName: string,
       lastName: string,
       arrivalDate: string
       departureDate: string
+      id: any
     } = this.state;
 
     const { formType }: {
@@ -75,10 +94,12 @@ class Form extends Component<FormProps, FormState> {
           refetchQueries={[{ query: GET_ALL_RESERVATIONS }]}
         >
           {(createReservation: any, data: any) => (
-            <form onSubmit={ async e => {
-              e.preventDefault()
-              const res = await createReservation()
-            }}>
+            <form 
+              onSubmit={ async e => {
+                e.preventDefault()
+                const res = await createReservation()
+              }}
+            >
             <fieldset disabled={data.loading} aria-busy={data.loading}>
               <Input 
                 onChange={this.handleInputChange}
@@ -113,8 +134,32 @@ class Form extends Component<FormProps, FormState> {
           )}
         </Mutation>
     ) : (
-      <Query>
-
+      <Query 
+        query={GET_SINGLE_RESERVATION} 
+        variables={this.state.id}
+      >
+        {(getSingleReservation: any) => (
+          <form 
+            onSubmit={ async e => {
+              e.preventDefault()
+              const res = await getSingleReservation()
+              console.log(res)
+            }}
+          >
+            <fieldset>
+              <Input 
+                onChange={this.handleInputChange}
+                value={id}
+                name="id"   
+                type="text" 
+              />
+              <input 
+                value="Submit" 
+                type="submit" 
+              />
+            </fieldset>
+          </form>
+        )}
       </Query>
     )
     }
