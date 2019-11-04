@@ -6,10 +6,9 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { HttpLink } from 'apollo-link-http';
 import App from './App/App';
 
-
 const cache = new InMemoryCache();
 const link = new HttpLink({
-  uri: 'http://localhost:5000/graphql'
+  uri: process.env.PORT || 'https://hi-heroku-backend.herokuapp.com/graphql'
 });
 
 const client = new ApolloClient({
